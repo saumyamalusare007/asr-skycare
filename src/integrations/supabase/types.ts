@@ -14,7 +14,96 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      missions: {
+        Row: {
+          aadhar_id: string | null
+          aircraft_model: string | null
+          ambulance_dropoff: boolean | null
+          ambulance_pickup: boolean | null
+          booking_id: string
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string
+          destination_city: string
+          destination_code: string
+          flight_date: string | null
+          id: string
+          medical_notes: string | null
+          mission_status: string | null
+          operator_name: string | null
+          origin_city: string
+          origin_code: string
+          passengers: number | null
+          patient_age: number | null
+          patient_condition: string | null
+          patient_name: string
+          payment_status: string | null
+          priority_level: string | null
+          quoted_price: number
+          service_type: string
+          status_step: number | null
+          updated_at: string
+        }
+        Insert: {
+          aadhar_id?: string | null
+          aircraft_model?: string | null
+          ambulance_dropoff?: boolean | null
+          ambulance_pickup?: boolean | null
+          booking_id: string
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          destination_city: string
+          destination_code: string
+          flight_date?: string | null
+          id?: string
+          medical_notes?: string | null
+          mission_status?: string | null
+          operator_name?: string | null
+          origin_city: string
+          origin_code: string
+          passengers?: number | null
+          patient_age?: number | null
+          patient_condition?: string | null
+          patient_name: string
+          payment_status?: string | null
+          priority_level?: string | null
+          quoted_price: number
+          service_type: string
+          status_step?: number | null
+          updated_at?: string
+        }
+        Update: {
+          aadhar_id?: string | null
+          aircraft_model?: string | null
+          ambulance_dropoff?: boolean | null
+          ambulance_pickup?: boolean | null
+          booking_id?: string
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          destination_city?: string
+          destination_code?: string
+          flight_date?: string | null
+          id?: string
+          medical_notes?: string | null
+          mission_status?: string | null
+          operator_name?: string | null
+          origin_city?: string
+          origin_code?: string
+          passengers?: number | null
+          patient_age?: number | null
+          patient_condition?: string | null
+          patient_name?: string
+          payment_status?: string | null
+          priority_level?: string | null
+          quoted_price?: number
+          service_type?: string
+          status_step?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
