@@ -9,7 +9,7 @@
  import { Textarea } from "@/components/ui/textarea";
  import { Switch } from "@/components/ui/switch";
  import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
- import { Heart, Activity, AlertTriangle, Baby, ArrowLeft, ArrowRight, Check, Plane, Ambulance, User, MapPin, Calendar, Phone, Mail, FileText, Shield } from "lucide-react";
+ import { Heart, Activity, AlertTriangle, Baby, ArrowLeft, ArrowRight, Check, Plane, Ambulance, User, MapPin, Calendar, Phone, Mail, FileText } from "lucide-react";
  import { serviceTypes, indianCities, formatINR, type IndianCity } from "@/lib/data";
  
  const steps = [
@@ -30,22 +30,21 @@
    const [searchParams] = useSearchParams();
    const navigate = useNavigate();
    const [currentStep, setCurrentStep] = useState(1);
-  const [formData, setFormData] = useState({
-    serviceType: searchParams.get("service") || "",
-    patientName: "",
-    age: "",
-    aadharId: "",
-    contactPhone: "",
-    contactEmail: "",
-    condition: "",
-    medicalNotes: "",
-    origin: "",
-    destination: "",
-    flightDate: "",
-    passengers: 1,
-    ambulancePickup: false,
-    ambulanceDropoff: false,
-  });
+   const [formData, setFormData] = useState({
+     serviceType: searchParams.get("service") || "",
+     patientName: "",
+     age: "",
+     contactPhone: "",
+     contactEmail: "",
+     condition: "",
+     medicalNotes: "",
+     origin: "",
+     destination: "",
+     flightDate: "",
+     passengers: 1,
+     ambulancePickup: false,
+     ambulanceDropoff: false,
+   });
  
    const selectedService = serviceTypes.find(s => s.id === formData.serviceType);
    const originCity = indianCities.find(c => c.code === formData.origin);
@@ -263,32 +262,17 @@
                              onChange={(e) => setFormData({ ...formData, contactEmail: e.target.value })}
                            />
                          </div>
-                        </div>
-
-                        <div className="space-y-2">
-                          <Label htmlFor="aadharId">Aadhar ID</Label>
-                          <div className="relative">
-                            <Shield className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                            <Input
-                              id="aadharId"
-                              placeholder="1234 5678 9012"
-                              className="pl-10 font-mono"
-                              value={formData.aadharId}
-                              onChange={(e) => setFormData({ ...formData, aadharId: e.target.value })}
-                            />
-                          </div>
-                          <p className="text-xs text-muted-foreground">Required for medical transport verification</p>
-                        </div>
-
-                        <div className="space-y-2 md:col-span-2">
-                          <Label htmlFor="condition">Medical Condition</Label>
-                          <Input
-                            id="condition"
-                            placeholder="Primary diagnosis or condition"
-                            value={formData.condition}
-                            onChange={(e) => setFormData({ ...formData, condition: e.target.value })}
-                          />
-                        </div>
+                       </div>
+ 
+                       <div className="space-y-2 md:col-span-2">
+                         <Label htmlFor="condition">Medical Condition</Label>
+                         <Input
+                           id="condition"
+                           placeholder="Primary diagnosis or condition"
+                           value={formData.condition}
+                           onChange={(e) => setFormData({ ...formData, condition: e.target.value })}
+                         />
+                       </div>
  
                        <div className="space-y-2 md:col-span-2">
                          <Label htmlFor="notes">Additional Medical Notes</Label>

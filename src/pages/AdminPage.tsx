@@ -1,329 +1,571 @@
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
-import { AdminStats } from "@/components/admin/AdminStats";
-import { RecentActivityFeed } from "@/components/admin/RecentActivityFeed";
-import { MissionDetailsExpanded } from "@/components/admin/MissionDetailsExpanded";
-import {
-  Plane, Search, CheckCircle, Clock, Activity, Bell,
-  RefreshCw, Play, Heart, AlertTriangle, Baby, XCircle, Ambulance
-} from "lucide-react";
-import { indianCities } from "@/lib/data";
-import { useMissions } from "@/hooks/useMissions";
-import logo from "@/assets/logo-asr.png";
-
-const statusConfig: Record<string, { label: string; color: string; icon: React.ComponentType<{ className?: string }> }> = {
-  payment_confirmed: { label: "Payment Confirmed", color: "bg-info/20 text-info", icon: CheckCircle },
-  aircraft_prep: { label: "Aircraft Prep", color: "bg-warning/20 text-warning", icon: Clock },
-  ambulance_enroute: { label: "Ambulance En-route", color: "bg-aviation-red/20 text-aviation-red", icon: Ambulance },
-  airborne: { label: "Airborne", color: "bg-success/20 text-success", icon: Plane },
-  landed: { label: "Landed", color: "bg-success/20 text-success", icon: CheckCircle },
-  completed: { label: "Completed", color: "bg-muted text-muted-foreground", icon: CheckCircle },
-  cancelled: { label: "Cancelled", color: "bg-destructive/20 text-destructive", icon: XCircle },
-};
-
-const timelineSteps = [
-  { step: 1, label: "Payment", status: "payment_confirmed" },
-  { step: 2, label: "Aircraft Prep", status: "aircraft_prep" },
-  { step: 3, label: "Ambulance", status: "ambulance_enroute" },
-  { step: 4, label: "Airborne", status: "airborne" },
-];
-
-const serviceIcons: Record<string, React.ComponentType<{ className?: string }>> = {
-  "organ-transplant": Heart,
-  "icu-transfer": Activity,
-  "emergency-evac": AlertTriangle,
-  "neonatal": Baby,
-};
-
-export default function AdminPage() {
-  const { missions, loading, updateMissionStatus } = useMissions();
-  const [selectedMission, setSelectedMission] = useState<typeof missions[0] | null>(null);
-  const [filterStatus, setFilterStatus] = useState("all");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [filterOrigin, setFilterOrigin] = useState("all");
-  const [newMissionAlert, setNewMissionAlert] = useState<string | null>(null);
-
-  // Select first mission when loaded
-  useEffect(() => {
-    if (missions.length > 0 && !selectedMission) {
-      setSelectedMission(missions[0]);
-    }
-  }, [missions, selectedMission]);
-
-  // Show alert for new missions
-  useEffect(() => {
-    if (missions.length > 0) {
-      const latestMission = missions[0];
-      const missionAge = Date.now() - new Date(latestMission.created_at).getTime();
-      if (missionAge < 10000) { // Less than 10 seconds old
-        setNewMissionAlert(latestMission.patient_name);
-        setTimeout(() => setNewMissionAlert(null), 5000);
-      }
-    }
-  }, [missions]);
-
-  const filteredMissions = missions.filter((mission) => {
-    if (filterStatus !== "all" && mission.mission_status !== filterStatus) return false;
-    if (filterOrigin !== "all" && mission.origin_code !== filterOrigin) return false;
-    if (searchQuery && 
-        !mission.patient_name.toLowerCase().includes(searchQuery.toLowerCase()) && 
-        !mission.booking_id.toLowerCase().includes(searchQuery.toLowerCase())) return false;
-    return true;
-  });
-
-  const stats = {
-    totalMissions: missions.length,
-    activeMissions: missions.filter(m => ["aircraft_prep", "ambulance_enroute", "airborne"].includes(m.mission_status || "")).length,
-    pendingPayments: missions.filter(m => m.payment_status === "pending").length,
-    revenue: missions.filter(m => m.payment_status === "paid").reduce((acc, m) => acc + Number(m.quoted_price), 0),
-  };
-
-  const handleAdvanceStep = async () => {
-    if (!selectedMission) return;
-    const currentStep = selectedMission.status_step || 1;
-    if (currentStep >= 4) return;
-
-    const nextStep = currentStep + 1;
-    const nextStatus = timelineSteps[nextStep - 1]?.status || "airborne";
-    
-    await updateMissionStatus(selectedMission.id, nextStatus, nextStep);
-  };
-
-  return (
-    <div className="min-h-screen bg-muted/30 pb-20 lg:pb-0">
-      {/* New Mission Alert */}
-      <AnimatePresence>
-        {newMissionAlert && (
-          <motion.div
-            initial={{ opacity: 0, y: -100 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -100 }}
-            className="fixed top-4 left-1/2 -translate-x-1/2 z-[100] bg-aviation-red text-white px-6 py-3 rounded-full shadow-lg flex items-center gap-3"
-          >
-            <Bell className="h-5 w-5 animate-bounce" />
-            <span className="font-medium">New Mission: {newMissionAlert}</span>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Admin Header */}
-      <header className="bg-primary text-primary-foreground sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <img src={logo} alt="ASR Aviation" className="h-8 brightness-0 invert" />
-            <div className="h-6 w-px bg-white/20 hidden sm:block" />
-            <span className="font-display font-semibold hidden sm:inline">Mission Control</span>
-          </div>
-          <div className="flex items-center gap-4">
-            <span className="flex items-center gap-2 text-sm">
-              <span className="h-2 w-2 rounded-full bg-success animate-pulse" />
-              <span className="hidden sm:inline">Operations Center Active</span>
-            </span>
-            <Button variant="aviation" size="sm" className="min-h-[40px]">
-              <RefreshCw className="h-4 w-4 sm:mr-2" />
-              <span className="hidden sm:inline">Refresh</span>
-            </Button>
-          </div>
-        </div>
-      </header>
-
-      <main className="container mx-auto px-4 py-4 lg:py-8">
-        {/* Stats Cards */}
-        <AdminStats {...stats} />
-
-        {loading ? (
-          <div className="flex items-center justify-center py-20">
-            <div className="h-8 w-8 border-4 border-aviation-red border-t-transparent rounded-full animate-spin" />
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6">
-            {/* Left Column - Mission Queue */}
-            <div className="lg:col-span-3 space-y-4">
-              <div className="bento-card h-fit">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="font-display text-lg font-semibold">Mission Queue</h2>
-                  <span className="text-sm text-muted-foreground">{filteredMissions.length}</span>
-                </div>
-
-                {/* Filters */}
-                <div className="space-y-3 mb-4">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      placeholder="Search..."
-                      className="pl-10"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                  </div>
-                  <div className="flex gap-2">
-                    <Select value={filterStatus} onValueChange={setFilterStatus}>
-                      <SelectTrigger className="flex-1 min-h-[40px]">
-                        <SelectValue placeholder="Status" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All Status</SelectItem>
-                        <SelectItem value="payment_confirmed">Payment Confirmed</SelectItem>
-                        <SelectItem value="aircraft_prep">Aircraft Prep</SelectItem>
-                        <SelectItem value="ambulance_enroute">Ambulance En-route</SelectItem>
-                        <SelectItem value="airborne">Airborne</SelectItem>
-                        <SelectItem value="completed">Completed</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <Select value={filterOrigin} onValueChange={setFilterOrigin}>
-                      <SelectTrigger className="flex-1 min-h-[40px]">
-                        <SelectValue placeholder="City" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All</SelectItem>
-                        {indianCities.map(city => (
-                          <SelectItem key={city.code} value={city.code}>{city.code}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                {/* Mission List */}
-                <div className="space-y-2 max-h-[300px] lg:max-h-[400px] overflow-y-auto">
-                  {filteredMissions.length === 0 ? (
-                    <div className="text-center py-8 text-muted-foreground">
-                      <Plane className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                      <p className="text-sm">No missions found</p>
-                    </div>
-                  ) : (
-                    filteredMissions.map((mission) => {
-                      const status = statusConfig[mission.mission_status || "payment_confirmed"] || statusConfig.payment_confirmed;
-                      const ServiceIcon = serviceIcons[mission.service_type] || Activity;
-                      return (
-                        <button
-                          key={mission.id}
-                          onClick={() => setSelectedMission(mission)}
-                          className={`w-full text-left p-3 rounded-xl border transition-all min-h-[70px] ${
-                            selectedMission?.id === mission.id
-                              ? "border-aviation-red bg-aviation-red/5"
-                              : "border-border hover:border-aviation-red/50 hover:bg-muted/50"
-                          }`}
-                        >
-                          <div className="flex items-start justify-between mb-1.5">
-                            <div className="flex items-center gap-2">
-                              <div className="p-1 rounded-lg bg-primary/10">
-                                <ServiceIcon className="h-3 w-3 text-primary" />
-                              </div>
-                              <span className="font-medium text-foreground text-xs">{mission.booking_id}</span>
-                            </div>
-                            <Badge className={`${status.color} text-[9px] px-1.5 py-0.5`}>{status.label}</Badge>
-                          </div>
-                          <p className="font-medium text-sm text-foreground mb-0.5">{mission.patient_name}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {mission.origin_code} → {mission.destination_code}
-                          </p>
-                        </button>
-                      );
-                    })
-                  )}
-                </div>
-              </div>
-
-              {/* Recent Activity Feed - Desktop Only */}
-              <div className="hidden lg:block">
-                <RecentActivityFeed missions={missions} onSelectMission={setSelectedMission} />
-              </div>
-            </div>
-
-            {/* Right Column - Mission Details */}
-            <div className="lg:col-span-9 space-y-4 lg:space-y-6">
-              {selectedMission ? (
-                <>
-                  {/* Mission Timeline Header */}
-                  <motion.div
-                    key={selectedMission.id}
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    className="bento-card"
-                  >
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
-                      <div>
-                        <h2 className="font-display text-xl font-semibold text-foreground">Mission Timeline</h2>
-                        <p className="text-sm text-muted-foreground">{selectedMission.booking_id}</p>
-                      </div>
-                      <div className="flex gap-2">
-                        {(selectedMission.status_step || 1) < 4 && (
-                          <Button variant="aviation" size="sm" onClick={handleAdvanceStep} className="min-h-[40px]">
-                            <Play className="h-4 w-4 mr-2" />
-                            Advance Step
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Timeline */}
-                    <div className="relative">
-                      <div className="flex items-center justify-between">
-                        {timelineSteps.map((step) => {
-                          const isCompleted = (selectedMission.status_step || 1) > step.step;
-                          const isCurrent = (selectedMission.status_step || 1) === step.step;
-                          return (
-                            <div key={step.step} className="flex flex-col items-center relative z-10 flex-1">
-                              <motion.div
-                                className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center border-2 transition-all ${
-                                  isCompleted
-                                    ? "bg-success border-success text-white"
-                                    : isCurrent
-                                    ? "bg-aviation-red border-aviation-red text-white animate-pulse-glow"
-                                    : "bg-background border-border text-muted-foreground"
-                                }`}
-                                animate={isCurrent ? { scale: [1, 1.05, 1] } : {}}
-                                transition={{ repeat: Infinity, duration: 2 }}
-                              >
-                                {isCompleted ? (
-                                  <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5" />
-                                ) : (
-                                  <span className="font-semibold text-sm">{step.step}</span>
-                                )}
-                              </motion.div>
-                              <span className={`mt-2 text-[10px] sm:text-xs font-medium text-center ${
-                                isCompleted || isCurrent ? "text-foreground" : "text-muted-foreground"
-                              }`}>
-                                {step.label}
-                              </span>
-                            </div>
-                          );
-                        })}
-                      </div>
-                      {/* Progress Line */}
-                      <div className="absolute top-5 sm:top-6 left-[10%] right-[10%] h-0.5 bg-border -z-0">
-                        <motion.div
-                          className="h-full bg-gradient-to-r from-success to-aviation-red"
-                          initial={{ width: "0%" }}
-                          animate={{ width: `${(((selectedMission.status_step || 1) - 1) / (timelineSteps.length - 1)) * 100}%` }}
-                          transition={{ duration: 1, ease: "easeOut" }}
-                        />
-                      </div>
-                    </div>
-                  </motion.div>
-
-                  {/* Expanded Mission Details */}
-                  <MissionDetailsExpanded mission={selectedMission} />
-                </>
-              ) : (
-                <div className="bento-card flex items-center justify-center py-20">
-                  <div className="text-center text-muted-foreground">
-                    <Plane className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>Select a mission to view details</p>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-      </main>
-      <MobileBottomNav />
-    </div>
-  );
-}
+ import { useState } from "react";
+ import { motion } from "framer-motion";
+ import { Header } from "@/components/layout/Header";
+ import { Button } from "@/components/ui/button";
+ import { Input } from "@/components/ui/input";
+ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+ import { Badge } from "@/components/ui/badge";
+ import {
+   Plane, Users, DollarSign, Clock, Search, Filter, MoreVertical,
+   CheckCircle, AlertCircle, XCircle, MapPin, Calendar, Phone, Mail,
+   Activity, Heart, AlertTriangle, Baby, ChevronRight, Play, Pause,
+   RefreshCw, Eye, CreditCard, FileText, Settings
+ } from "lucide-react";
+ import { fleetData, indianCities, formatINR, serviceTypes } from "@/lib/data";
+ import logo from "@/assets/logo-asr.png";
+ 
+ // Mock bookings data
+ const mockBookings = [
+   {
+     id: "ASR-001",
+     patientName: "Rajesh Kumar",
+     age: 45,
+     condition: "Cardiac Emergency",
+     serviceType: "emergency-evac",
+     origin: "DEL",
+     destination: "BOM",
+     status: "in_progress",
+     statusStep: 3,
+     quotedPrice: 2850000,
+     paymentStatus: "paid",
+     flightDate: "2026-02-05",
+     createdAt: "2026-02-05T08:30:00",
+     contactPhone: "+91 98765 43210",
+     passengers: 2,
+     ambulancePickup: true,
+     ambulanceDropoff: true,
+     assignedAircraft: "Learjet 45",
+     operator: "Xeontech Aviation",
+   },
+   {
+     id: "ASR-002",
+     patientName: "Priya Sharma",
+     age: 28,
+     condition: "Organ Transplant",
+     serviceType: "organ-transplant",
+     origin: "BLR",
+     destination: "DEL",
+     status: "confirmed",
+     statusStep: 2,
+     quotedPrice: 1950000,
+     paymentStatus: "paid",
+     flightDate: "2026-02-06",
+     createdAt: "2026-02-04T14:20:00",
+     contactPhone: "+91 87654 32109",
+     passengers: 3,
+     ambulancePickup: true,
+     ambulanceDropoff: false,
+     assignedAircraft: "King Air B200",
+     operator: "VSR Ventures",
+   },
+   {
+     id: "ASR-003",
+     patientName: "Baby Arjun",
+     age: 0,
+     condition: "Neonatal ICU Transfer",
+     serviceType: "neonatal",
+     origin: "MAA",
+     destination: "HYD",
+     status: "pending",
+     statusStep: 1,
+     quotedPrice: 2200000,
+     paymentStatus: "pending",
+     flightDate: "2026-02-07",
+     createdAt: "2026-02-05T10:00:00",
+     contactPhone: "+91 76543 21098",
+     passengers: 4,
+     ambulancePickup: true,
+     ambulanceDropoff: true,
+     assignedAircraft: null,
+     operator: null,
+   },
+   {
+     id: "ASR-004",
+     patientName: "Mohammed Ali",
+     age: 62,
+     condition: "ICU Transfer",
+     serviceType: "icu-transfer",
+     origin: "CCU",
+     destination: "DEL",
+     status: "completed",
+     statusStep: 4,
+     quotedPrice: 3500000,
+     paymentStatus: "paid",
+     flightDate: "2026-02-03",
+     createdAt: "2026-02-02T09:15:00",
+     contactPhone: "+91 65432 10987",
+     passengers: 2,
+     ambulancePickup: true,
+     ambulanceDropoff: true,
+     assignedAircraft: "Gulfstream G550",
+     operator: "Club One Air",
+   },
+ ];
+ 
+ const statusConfig = {
+   pending: { label: "Pending", color: "bg-warning/20 text-warning", icon: Clock },
+   confirmed: { label: "Confirmed", color: "bg-info/20 text-info", icon: CheckCircle },
+   in_progress: { label: "In Progress", color: "bg-success/20 text-success", icon: Activity },
+   completed: { label: "Completed", color: "bg-muted text-muted-foreground", icon: CheckCircle },
+   cancelled: { label: "Cancelled", color: "bg-destructive/20 text-destructive", icon: XCircle },
+ };
+ 
+ const timelineSteps = [
+   { step: 1, label: "Request Received" },
+   { step: 2, label: "Aircraft Prep" },
+   { step: 3, label: "Ground Ambulance" },
+   { step: 4, label: "Airborne" },
+ ];
+ 
+ const serviceIcons: Record<string, React.ComponentType<{ className?: string }>> = {
+   "organ-transplant": Heart,
+   "icu-transfer": Activity,
+   "emergency-evac": AlertTriangle,
+   "neonatal": Baby,
+ };
+ 
+ export default function AdminPage() {
+   const [selectedBooking, setSelectedBooking] = useState(mockBookings[0]);
+   const [filterStatus, setFilterStatus] = useState("all");
+   const [searchQuery, setSearchQuery] = useState("");
+   const [filterOrigin, setFilterOrigin] = useState("all");
+ 
+   const filteredBookings = mockBookings.filter((booking) => {
+     if (filterStatus !== "all" && booking.status !== filterStatus) return false;
+     if (filterOrigin !== "all" && booking.origin !== filterOrigin) return false;
+     if (searchQuery && !booking.patientName.toLowerCase().includes(searchQuery.toLowerCase()) && !booking.id.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+     return true;
+   });
+ 
+   const stats = {
+     totalMissions: mockBookings.length,
+     activeMissions: mockBookings.filter(b => b.status === "in_progress").length,
+     pendingPayments: mockBookings.filter(b => b.paymentStatus === "pending").length,
+     revenue: mockBookings.filter(b => b.paymentStatus === "paid").reduce((acc, b) => acc + b.quotedPrice, 0),
+   };
+ 
+   return (
+     <div className="min-h-screen bg-muted/30">
+       {/* Admin Header */}
+       <header className="bg-primary text-primary-foreground sticky top-0 z-50">
+         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
+           <div className="flex items-center gap-4">
+             <img src={logo} alt="ASR Aviation" className="h-8 brightness-0 invert" />
+             <div className="h-6 w-px bg-white/20" />
+             <span className="font-semibold">Admin Dashboard</span>
+           </div>
+           <div className="flex items-center gap-4">
+             <span className="flex items-center gap-2 text-sm">
+               <span className="h-2 w-2 rounded-full bg-success animate-pulse" />
+               Operations Center Active
+             </span>
+             <Button variant="aviation" size="sm">
+               <RefreshCw className="h-4 w-4 mr-2" />
+               Refresh
+             </Button>
+           </div>
+         </div>
+       </header>
+ 
+       <main className="container mx-auto px-4 py-8">
+         {/* Stats Cards */}
+         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+           <motion.div
+             initial={{ opacity: 0, y: 20 }}
+             animate={{ opacity: 1, y: 0 }}
+             className="bento-card"
+           >
+             <div className="flex items-center justify-between">
+               <div>
+                 <p className="text-sm text-muted-foreground">Total Missions</p>
+                 <p className="text-3xl font-bold text-foreground">{stats.totalMissions}</p>
+               </div>
+               <div className="p-3 rounded-xl bg-primary/10">
+                 <Plane className="h-6 w-6 text-primary" />
+               </div>
+             </div>
+           </motion.div>
+           
+           <motion.div
+             initial={{ opacity: 0, y: 20 }}
+             animate={{ opacity: 1, y: 0 }}
+             transition={{ delay: 0.1 }}
+             className="bento-card"
+           >
+             <div className="flex items-center justify-between">
+               <div>
+                 <p className="text-sm text-muted-foreground">Active Missions</p>
+                 <p className="text-3xl font-bold text-success">{stats.activeMissions}</p>
+               </div>
+               <div className="p-3 rounded-xl bg-success/10">
+                 <Activity className="h-6 w-6 text-success" />
+               </div>
+             </div>
+           </motion.div>
+           
+           <motion.div
+             initial={{ opacity: 0, y: 20 }}
+             animate={{ opacity: 1, y: 0 }}
+             transition={{ delay: 0.2 }}
+             className="bento-card"
+           >
+             <div className="flex items-center justify-between">
+               <div>
+                 <p className="text-sm text-muted-foreground">Pending Payments</p>
+                 <p className="text-3xl font-bold text-warning">{stats.pendingPayments}</p>
+               </div>
+               <div className="p-3 rounded-xl bg-warning/10">
+                 <CreditCard className="h-6 w-6 text-warning" />
+               </div>
+             </div>
+           </motion.div>
+           
+           <motion.div
+             initial={{ opacity: 0, y: 20 }}
+             animate={{ opacity: 1, y: 0 }}
+             transition={{ delay: 0.3 }}
+             className="bento-card"
+           >
+             <div className="flex items-center justify-between">
+               <div>
+                 <p className="text-sm text-muted-foreground">Total Revenue</p>
+                 <p className="text-2xl font-bold text-foreground">{formatINR(stats.revenue)}</p>
+               </div>
+               <div className="p-3 rounded-xl bg-aviation-red/10">
+                 <DollarSign className="h-6 w-6 text-aviation-red" />
+               </div>
+             </div>
+           </motion.div>
+         </div>
+ 
+         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+           {/* Bookings List */}
+           <div className="lg:col-span-1">
+             <div className="bento-card h-fit">
+               <div className="flex items-center justify-between mb-4">
+                 <h2 className="font-display text-lg font-semibold">Mission Queue</h2>
+                 <span className="text-sm text-muted-foreground">{filteredBookings.length} missions</span>
+               </div>
+ 
+               {/* Filters */}
+               <div className="space-y-3 mb-4">
+                 <div className="relative">
+                   <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                   <Input
+                     placeholder="Search by name or ID..."
+                     className="pl-10"
+                     value={searchQuery}
+                     onChange={(e) => setSearchQuery(e.target.value)}
+                   />
+                 </div>
+                 <div className="flex gap-2">
+                   <Select value={filterStatus} onValueChange={setFilterStatus}>
+                     <SelectTrigger className="flex-1">
+                       <SelectValue placeholder="Status" />
+                     </SelectTrigger>
+                     <SelectContent>
+                       <SelectItem value="all">All Status</SelectItem>
+                       <SelectItem value="pending">Pending</SelectItem>
+                       <SelectItem value="confirmed">Confirmed</SelectItem>
+                       <SelectItem value="in_progress">In Progress</SelectItem>
+                       <SelectItem value="completed">Completed</SelectItem>
+                     </SelectContent>
+                   </Select>
+                   <Select value={filterOrigin} onValueChange={setFilterOrigin}>
+                     <SelectTrigger className="flex-1">
+                       <SelectValue placeholder="Origin" />
+                     </SelectTrigger>
+                     <SelectContent>
+                       <SelectItem value="all">All Cities</SelectItem>
+                       {indianCities.map(city => (
+                         <SelectItem key={city.code} value={city.code}>{city.code}</SelectItem>
+                       ))}
+                     </SelectContent>
+                   </Select>
+                 </div>
+               </div>
+ 
+               {/* Booking List */}
+               <div className="space-y-2 max-h-[500px] overflow-y-auto">
+                 {filteredBookings.map((booking) => {
+                   const status = statusConfig[booking.status as keyof typeof statusConfig];
+                   const ServiceIcon = serviceIcons[booking.serviceType];
+                   return (
+                     <button
+                       key={booking.id}
+                       onClick={() => setSelectedBooking(booking)}
+                       className={`w-full text-left p-4 rounded-xl border transition-all ${
+                         selectedBooking?.id === booking.id
+                           ? "border-aviation-red bg-aviation-red/5"
+                           : "border-border hover:border-aviation-red/50 hover:bg-muted/50"
+                       }`}
+                     >
+                       <div className="flex items-start justify-between mb-2">
+                         <div className="flex items-center gap-2">
+                           <div className="p-1.5 rounded-lg bg-primary/10">
+                             <ServiceIcon className="h-4 w-4 text-primary" />
+                           </div>
+                           <span className="font-medium text-foreground">{booking.id}</span>
+                         </div>
+                         <Badge className={status.color}>{status.label}</Badge>
+                       </div>
+                       <p className="font-medium text-sm text-foreground mb-1">{booking.patientName}</p>
+                       <p className="text-xs text-muted-foreground mb-2">
+                         {booking.origin} → {booking.destination}
+                       </p>
+                       <div className="flex items-center justify-between text-xs">
+                         <span className="text-muted-foreground">{booking.flightDate}</span>
+                         <span className={booking.paymentStatus === "paid" ? "text-success" : "text-warning"}>
+                           {booking.paymentStatus === "paid" ? "✓ Paid" : "⏳ Pending"}
+                         </span>
+                       </div>
+                     </button>
+                   );
+                 })}
+               </div>
+             </div>
+           </div>
+ 
+           {/* Selected Booking Details */}
+           <div className="lg:col-span-2 space-y-6">
+             {selectedBooking && (
+               <>
+                 {/* Mission Timeline */}
+                 <motion.div
+                   key={selectedBooking.id}
+                   initial={{ opacity: 0, x: 20 }}
+                   animate={{ opacity: 1, x: 0 }}
+                   className="bento-card"
+                 >
+                   <div className="flex items-center justify-between mb-6">
+                     <div>
+                       <h2 className="font-display text-xl font-semibold">Mission Timeline</h2>
+                       <p className="text-sm text-muted-foreground">{selectedBooking.id}</p>
+                     </div>
+                     <div className="flex gap-2">
+                       {selectedBooking.status === "in_progress" && (
+                         <Button variant="aviation" size="sm">
+                           <Play className="h-4 w-4 mr-2" />
+                           Advance Step
+                         </Button>
+                       )}
+                       <Button variant="outline" size="sm">
+                         <Eye className="h-4 w-4 mr-2" />
+                         View Details
+                       </Button>
+                     </div>
+                   </div>
+ 
+                   {/* Timeline */}
+                   <div className="relative">
+                     <div className="flex items-center justify-between">
+                       {timelineSteps.map((step, index) => {
+                         const isCompleted = selectedBooking.statusStep > step.step;
+                         const isCurrent = selectedBooking.statusStep === step.step;
+                         return (
+                           <div key={step.step} className="flex flex-col items-center relative z-10">
+                             <motion.div
+                               className={`w-12 h-12 rounded-full flex items-center justify-center border-2 transition-all ${
+                                 isCompleted
+                                   ? "bg-success border-success text-white"
+                                   : isCurrent
+                                   ? "bg-aviation-red border-aviation-red text-white animate-pulse-glow"
+                                   : "bg-background border-border text-muted-foreground"
+                               }`}
+                               animate={isCurrent ? { scale: [1, 1.1, 1] } : {}}
+                               transition={{ repeat: Infinity, duration: 2 }}
+                             >
+                               {isCompleted ? (
+                                 <CheckCircle className="h-5 w-5" />
+                               ) : (
+                                 <span className="font-semibold">{step.step}</span>
+                               )}
+                             </motion.div>
+                             <span className={`mt-2 text-xs font-medium text-center ${
+                               isCompleted || isCurrent ? "text-foreground" : "text-muted-foreground"
+                             }`}>
+                               {step.label}
+                             </span>
+                           </div>
+                         );
+                       })}
+                     </div>
+                     {/* Progress Line */}
+                     <div className="absolute top-6 left-6 right-6 h-0.5 bg-border -z-0">
+                       <motion.div
+                         className="h-full bg-gradient-to-r from-success to-aviation-red"
+                         initial={{ width: "0%" }}
+                         animate={{ width: `${((selectedBooking.statusStep - 1) / (timelineSteps.length - 1)) * 100}%` }}
+                         transition={{ duration: 1, ease: "easeOut" }}
+                       />
+                     </div>
+                   </div>
+                 </motion.div>
+ 
+                 {/* Patient & Flight Details */}
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                   <motion.div
+                     initial={{ opacity: 0, y: 20 }}
+                     animate={{ opacity: 1, y: 0 }}
+                     transition={{ delay: 0.1 }}
+                     className="bento-card"
+                   >
+                     <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
+                       <Users className="h-5 w-5 text-muted-foreground" />
+                       Patient Details
+                     </h3>
+                     <div className="space-y-3">
+                       <div className="flex justify-between text-sm">
+                         <span className="text-muted-foreground">Name</span>
+                         <span className="font-medium">{selectedBooking.patientName}</span>
+                       </div>
+                       <div className="flex justify-between text-sm">
+                         <span className="text-muted-foreground">Age</span>
+                         <span className="font-medium">{selectedBooking.age === 0 ? "Infant" : `${selectedBooking.age} years`}</span>
+                       </div>
+                       <div className="flex justify-between text-sm">
+                         <span className="text-muted-foreground">Condition</span>
+                         <span className="font-medium">{selectedBooking.condition}</span>
+                       </div>
+                       <div className="flex justify-between text-sm">
+                         <span className="text-muted-foreground">Contact</span>
+                         <span className="font-medium">{selectedBooking.contactPhone}</span>
+                       </div>
+                       <div className="flex justify-between text-sm">
+                         <span className="text-muted-foreground">Passengers</span>
+                         <span className="font-medium">{selectedBooking.passengers}</span>
+                       </div>
+                     </div>
+                   </motion.div>
+ 
+                   <motion.div
+                     initial={{ opacity: 0, y: 20 }}
+                     animate={{ opacity: 1, y: 0 }}
+                     transition={{ delay: 0.2 }}
+                     className="bento-card"
+                   >
+                     <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
+                       <Plane className="h-5 w-5 text-muted-foreground" />
+                       Flight Details
+                     </h3>
+                     <div className="space-y-3">
+                       <div className="flex justify-between text-sm">
+                         <span className="text-muted-foreground">Route</span>
+                         <span className="font-medium">{selectedBooking.origin} → {selectedBooking.destination}</span>
+                       </div>
+                       <div className="flex justify-between text-sm">
+                         <span className="text-muted-foreground">Date</span>
+                         <span className="font-medium">{selectedBooking.flightDate}</span>
+                       </div>
+                       <div className="flex justify-between text-sm">
+                         <span className="text-muted-foreground">Aircraft</span>
+                         <span className="font-medium">{selectedBooking.assignedAircraft || "Not Assigned"}</span>
+                       </div>
+                       <div className="flex justify-between text-sm">
+                         <span className="text-muted-foreground">Operator</span>
+                         <span className="font-medium">{selectedBooking.operator || "Pending"}</span>
+                       </div>
+                       <div className="flex justify-between text-sm">
+                         <span className="text-muted-foreground">Ground Support</span>
+                         <span className="font-medium">
+                           {selectedBooking.ambulancePickup && selectedBooking.ambulanceDropoff
+                             ? "Pickup & Drop"
+                             : selectedBooking.ambulancePickup
+                             ? "Pickup Only"
+                             : selectedBooking.ambulanceDropoff
+                             ? "Drop Only"
+                             : "None"}
+                         </span>
+                       </div>
+                     </div>
+                   </motion.div>
+                 </div>
+ 
+                 {/* Payment & Actions */}
+                 <motion.div
+                   initial={{ opacity: 0, y: 20 }}
+                   animate={{ opacity: 1, y: 0 }}
+                   transition={{ delay: 0.3 }}
+                   className="bento-card"
+                 >
+                   <div className="flex items-center justify-between mb-4">
+                     <h3 className="font-semibold text-foreground flex items-center gap-2">
+                       <CreditCard className="h-5 w-5 text-muted-foreground" />
+                       Payment Status
+                     </h3>
+                     <Badge className={selectedBooking.paymentStatus === "paid" ? "bg-success/20 text-success" : "bg-warning/20 text-warning"}>
+                       {selectedBooking.paymentStatus === "paid" ? "Paid" : "Pending Payment"}
+                     </Badge>
+                   </div>
+                   <div className="flex items-center justify-between p-4 rounded-xl bg-muted/50 mb-4">
+                     <div>
+                       <p className="text-sm text-muted-foreground">Quoted Price</p>
+                       <p className="text-2xl font-bold text-foreground">{formatINR(selectedBooking.quotedPrice)}</p>
+                     </div>
+                     {selectedBooking.paymentStatus === "pending" && (
+                       <Button variant="aviation" size="sm">
+                         Send Payment Reminder
+                       </Button>
+                     )}
+                   </div>
+ 
+                   <div className="flex gap-3">
+                     <Button variant="outline" className="flex-1">
+                       <FileText className="h-4 w-4 mr-2" />
+                       Generate Invoice
+                     </Button>
+                     <Button variant="outline" className="flex-1">
+                       <Mail className="h-4 w-4 mr-2" />
+                       Contact Patient
+                     </Button>
+                     <Button variant="destructive" size="icon">
+                       <XCircle className="h-4 w-4" />
+                     </Button>
+                   </div>
+                 </motion.div>
+ 
+                 {/* Fleet Assignment (for pending bookings) */}
+                 {!selectedBooking.assignedAircraft && (
+                   <motion.div
+                     initial={{ opacity: 0, y: 20 }}
+                     animate={{ opacity: 1, y: 0 }}
+                     transition={{ delay: 0.4 }}
+                     className="bento-card border-warning/50 bg-warning/5"
+                   >
+                     <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
+                       <AlertCircle className="h-5 w-5 text-warning" />
+                       Assign Aircraft
+                     </h3>
+                     <p className="text-sm text-muted-foreground mb-4">
+                       Available aircraft based in or near {selectedBooking.origin}:
+                     </p>
+                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                       {fleetData
+                         .filter(a => a.baseHubCode === selectedBooking.origin || a.icuCapable)
+                         .slice(0, 4)
+                         .map((aircraft) => (
+                           <button
+                             key={aircraft.id}
+                             className="p-3 rounded-xl border border-border hover:border-aviation-red bg-card text-left transition-all"
+                           >
+                             <div className="flex items-center justify-between mb-2">
+                               <span className="font-medium text-sm">{aircraft.model}</span>
+                               {aircraft.icuCapable && (
+                                 <span className="text-xs px-2 py-0.5 rounded-full bg-success/10 text-success">ICU</span>
+                               )}
+                             </div>
+                             <p className="text-xs text-muted-foreground">{aircraft.operator}</p>
+                             <p className="text-xs text-muted-foreground">{aircraft.baseHub} • {formatINR(aircraft.hourlyRate)}/hr</p>
+                           </button>
+                         ))}
+                     </div>
+                   </motion.div>
+                 )}
+               </>
+             )}
+           </div>
+         </div>
+       </main>
+     </div>
+   );
+ }
