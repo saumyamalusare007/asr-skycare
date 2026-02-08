@@ -5,20 +5,21 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
+import { AdminStats } from "@/components/admin/AdminStats";
+import { RecentActivityFeed } from "@/components/admin/RecentActivityFeed";
+import { MissionDetailsExpanded } from "@/components/admin/MissionDetailsExpanded";
 import {
-  Plane, Users, DollarSign, Clock, Search, MoreVertical,
-  CheckCircle, AlertCircle, XCircle, MapPin, Calendar, Phone, Mail,
-  Activity, Heart, AlertTriangle, Baby, Play,
-  RefreshCw, Eye, CreditCard, Bell, ChevronRight, Ambulance
+  Plane, Search, CheckCircle, Clock, Activity, Bell,
+  RefreshCw, Play, Heart, AlertTriangle, Baby, XCircle, Ambulance
 } from "lucide-react";
-import { indianCities, formatINR } from "@/lib/data";
+import { indianCities } from "@/lib/data";
 import { useMissions } from "@/hooks/useMissions";
 import logo from "@/assets/logo-asr.png";
 
 const statusConfig: Record<string, { label: string; color: string; icon: React.ComponentType<{ className?: string }> }> = {
   payment_confirmed: { label: "Payment Confirmed", color: "bg-info/20 text-info", icon: CheckCircle },
   aircraft_prep: { label: "Aircraft Prep", color: "bg-warning/20 text-warning", icon: Clock },
-  ambulance_enroute: { label: "Ambulance En-route", color: "bg-aviation-red/20 text-aviation-red", icon: Activity },
+  ambulance_enroute: { label: "Ambulance En-route", color: "bg-aviation-red/20 text-aviation-red", icon: Ambulance },
   airborne: { label: "Airborne", color: "bg-success/20 text-success", icon: Plane },
   landed: { label: "Landed", color: "bg-success/20 text-success", icon: CheckCircle },
   completed: { label: "Completed", color: "bg-muted text-muted-foreground", icon: CheckCircle },
@@ -116,7 +117,7 @@ export default function AdminPage() {
           <div className="flex items-center gap-4">
             <img src={logo} alt="ASR Aviation" className="h-8 brightness-0 invert" />
             <div className="h-6 w-px bg-white/20 hidden sm:block" />
-            <span className="font-semibold hidden sm:inline">Admin Dashboard</span>
+            <span className="font-display font-semibold hidden sm:inline">Mission Control</span>
           </div>
           <div className="flex items-center gap-4">
             <span className="flex items-center gap-2 text-sm">
@@ -133,87 +134,20 @@ export default function AdminPage() {
 
       <main className="container mx-auto px-4 py-4 lg:py-8">
         {/* Stats Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4 mb-6 lg:mb-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bento-card p-4"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs sm:text-sm text-muted-foreground">Total Missions</p>
-                <p className="text-2xl sm:text-3xl font-bold text-foreground">{stats.totalMissions}</p>
-              </div>
-              <div className="p-2 sm:p-3 rounded-xl bg-primary/10">
-                <Plane className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
-              </div>
-            </div>
-          </motion.div>
-          
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="bento-card p-4"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs sm:text-sm text-muted-foreground">Active</p>
-                <p className="text-2xl sm:text-3xl font-bold text-success">{stats.activeMissions}</p>
-              </div>
-              <div className="p-2 sm:p-3 rounded-xl bg-success/10">
-                <Activity className="h-5 w-5 sm:h-6 sm:w-6 text-success" />
-              </div>
-            </div>
-          </motion.div>
-          
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="bento-card p-4"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs sm:text-sm text-muted-foreground">Pending</p>
-                <p className="text-2xl sm:text-3xl font-bold text-warning">{stats.pendingPayments}</p>
-              </div>
-              <div className="p-2 sm:p-3 rounded-xl bg-warning/10">
-                <CreditCard className="h-5 w-5 sm:h-6 sm:w-6 text-warning" />
-              </div>
-            </div>
-          </motion.div>
-          
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="bento-card p-4"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs sm:text-sm text-muted-foreground">Revenue</p>
-                <p className="text-lg sm:text-2xl font-bold text-foreground">{formatINR(stats.revenue)}</p>
-              </div>
-              <div className="p-2 sm:p-3 rounded-xl bg-aviation-red/10">
-                <DollarSign className="h-5 w-5 sm:h-6 sm:w-6 text-aviation-red" />
-              </div>
-            </div>
-          </motion.div>
-        </div>
+        <AdminStats {...stats} />
 
         {loading ? (
           <div className="flex items-center justify-center py-20">
             <div className="h-8 w-8 border-4 border-aviation-red border-t-transparent rounded-full animate-spin" />
           </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Bookings List */}
-            <div className="lg:col-span-1">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6">
+            {/* Left Column - Mission Queue */}
+            <div className="lg:col-span-3 space-y-4">
               <div className="bento-card h-fit">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="font-display text-lg font-semibold">Mission Queue</h2>
-                  <span className="text-sm text-muted-foreground">{filteredMissions.length} missions</span>
+                  <span className="text-sm text-muted-foreground">{filteredMissions.length}</span>
                 </div>
 
                 {/* Filters */}
@@ -246,7 +180,7 @@ export default function AdminPage() {
                         <SelectValue placeholder="City" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="all">All Cities</SelectItem>
+                        <SelectItem value="all">All</SelectItem>
                         {indianCities.map(city => (
                           <SelectItem key={city.code} value={city.code}>{city.code}</SelectItem>
                         ))}
@@ -256,11 +190,11 @@ export default function AdminPage() {
                 </div>
 
                 {/* Mission List */}
-                <div className="space-y-2 max-h-[400px] lg:max-h-[500px] overflow-y-auto">
+                <div className="space-y-2 max-h-[300px] lg:max-h-[400px] overflow-y-auto">
                   {filteredMissions.length === 0 ? (
                     <div className="text-center py-8 text-muted-foreground">
                       <Plane className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                      <p>No missions found</p>
+                      <p className="text-sm">No missions found</p>
                     </div>
                   ) : (
                     filteredMissions.map((mission) => {
@@ -270,46 +204,43 @@ export default function AdminPage() {
                         <button
                           key={mission.id}
                           onClick={() => setSelectedMission(mission)}
-                          className={`w-full text-left p-4 rounded-xl border transition-all min-h-[80px] ${
+                          className={`w-full text-left p-3 rounded-xl border transition-all min-h-[70px] ${
                             selectedMission?.id === mission.id
                               ? "border-aviation-red bg-aviation-red/5"
                               : "border-border hover:border-aviation-red/50 hover:bg-muted/50"
                           }`}
                         >
-                          <div className="flex items-start justify-between mb-2">
+                          <div className="flex items-start justify-between mb-1.5">
                             <div className="flex items-center gap-2">
-                              <div className="p-1.5 rounded-lg bg-primary/10">
-                                <ServiceIcon className="h-4 w-4 text-primary" />
+                              <div className="p-1 rounded-lg bg-primary/10">
+                                <ServiceIcon className="h-3 w-3 text-primary" />
                               </div>
-                              <span className="font-medium text-foreground text-sm">{mission.booking_id}</span>
+                              <span className="font-medium text-foreground text-xs">{mission.booking_id}</span>
                             </div>
-                            <Badge className={`${status.color} text-[10px]`}>{status.label}</Badge>
+                            <Badge className={`${status.color} text-[9px] px-1.5 py-0.5`}>{status.label}</Badge>
                           </div>
-                          <p className="font-medium text-sm text-foreground mb-1">{mission.patient_name}</p>
-                          <p className="text-xs text-muted-foreground mb-2">
+                          <p className="font-medium text-sm text-foreground mb-0.5">{mission.patient_name}</p>
+                          <p className="text-xs text-muted-foreground">
                             {mission.origin_code} → {mission.destination_code}
                           </p>
-                          <div className="flex items-center justify-between text-xs">
-                            <span className="text-muted-foreground">
-                              {new Date(mission.created_at).toLocaleDateString()}
-                            </span>
-                            <span className={mission.payment_status === "paid" ? "text-success" : "text-warning"}>
-                              {mission.payment_status === "paid" ? "✓ Paid" : "⏳ Pending"}
-                            </span>
-                          </div>
                         </button>
                       );
                     })
                   )}
                 </div>
               </div>
+
+              {/* Recent Activity Feed - Desktop Only */}
+              <div className="hidden lg:block">
+                <RecentActivityFeed missions={missions} onSelectMission={setSelectedMission} />
+              </div>
             </div>
 
-            {/* Selected Mission Details */}
-            <div className="lg:col-span-2 space-y-6">
+            {/* Right Column - Mission Details */}
+            <div className="lg:col-span-9 space-y-4 lg:space-y-6">
               {selectedMission ? (
                 <>
-                  {/* Mission Timeline */}
+                  {/* Mission Timeline Header */}
                   <motion.div
                     key={selectedMission.id}
                     initial={{ opacity: 0, x: 20 }}
@@ -318,7 +249,7 @@ export default function AdminPage() {
                   >
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
                       <div>
-                        <h2 className="font-display text-xl font-semibold">Mission Timeline</h2>
+                        <h2 className="font-display text-xl font-semibold text-foreground">Mission Timeline</h2>
                         <p className="text-sm text-muted-foreground">{selectedMission.booking_id}</p>
                       </div>
                       <div className="flex gap-2">
@@ -344,10 +275,10 @@ export default function AdminPage() {
                                   isCompleted
                                     ? "bg-success border-success text-white"
                                     : isCurrent
-                                    ? "bg-aviation-red border-aviation-red text-white"
+                                    ? "bg-aviation-red border-aviation-red text-white animate-pulse-glow"
                                     : "bg-background border-border text-muted-foreground"
                                 }`}
-                                animate={isCurrent ? { scale: [1, 1.1, 1] } : {}}
+                                animate={isCurrent ? { scale: [1, 1.05, 1] } : {}}
                                 transition={{ repeat: Infinity, duration: 2 }}
                               >
                                 {isCompleted ? (
@@ -377,117 +308,8 @@ export default function AdminPage() {
                     </div>
                   </motion.div>
 
-                  {/* Patient & Flight Details */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6">
-                    <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.1 }}
-                      className="bento-card"
-                    >
-                      <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-                        <Users className="h-5 w-5 text-muted-foreground" />
-                        Patient Details
-                      </h3>
-                      <div className="space-y-3">
-                        <div>
-                          <p className="text-xs text-muted-foreground">Name</p>
-                          <p className="font-medium">{selectedMission.patient_name}</p>
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
-                          <div>
-                            <p className="text-xs text-muted-foreground">Age</p>
-                            <p className="font-medium">{selectedMission.patient_age || "N/A"}</p>
-                          </div>
-                          <div>
-                            <p className="text-xs text-muted-foreground">Condition</p>
-                            <p className="font-medium text-sm">{selectedMission.patient_condition || "N/A"}</p>
-                          </div>
-                        </div>
-                        <div>
-                          <p className="text-xs text-muted-foreground">Contact</p>
-                          <p className="font-medium text-sm">{selectedMission.contact_phone || "N/A"}</p>
-                        </div>
-                        {selectedMission.medical_notes && (
-                          <div>
-                            <p className="text-xs text-muted-foreground">Medical Notes</p>
-                            <p className="text-sm text-muted-foreground">{selectedMission.medical_notes}</p>
-                          </div>
-                        )}
-                      </div>
-                    </motion.div>
-
-                    <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.2 }}
-                      className="bento-card"
-                    >
-                      <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-                        <Plane className="h-5 w-5 text-muted-foreground" />
-                        Flight Details
-                      </h3>
-                      <div className="space-y-3">
-                        <div className="flex items-center gap-4">
-                          <div className="text-center">
-                            <p className="text-2xl font-bold">{selectedMission.origin_code}</p>
-                            <p className="text-xs text-muted-foreground">{selectedMission.origin_city}</p>
-                          </div>
-                          <div className="flex-1 flex items-center gap-2">
-                            <div className="h-px flex-1 bg-border" />
-                            <Plane className="h-4 w-4 text-muted-foreground -rotate-45" />
-                            <div className="h-px flex-1 bg-border" />
-                          </div>
-                          <div className="text-center">
-                            <p className="text-2xl font-bold">{selectedMission.destination_code}</p>
-                            <p className="text-xs text-muted-foreground">{selectedMission.destination_city}</p>
-                          </div>
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
-                          <div>
-                            <p className="text-xs text-muted-foreground">Aircraft</p>
-                            <p className="font-medium text-sm">{selectedMission.aircraft_model || "Pending"}</p>
-                          </div>
-                          <div>
-                            <p className="text-xs text-muted-foreground">Passengers</p>
-                            <p className="font-medium">{selectedMission.passengers || 1}</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-4">
-                          {selectedMission.ambulance_pickup && (
-                            <span className="flex items-center gap-1 text-xs bg-success/10 text-success px-2 py-1 rounded-full">
-                              <Ambulance className="h-3 w-3" />
-                              Pickup
-                            </span>
-                          )}
-                          {selectedMission.ambulance_dropoff && (
-                            <span className="flex items-center gap-1 text-xs bg-success/10 text-success px-2 py-1 rounded-full">
-                              <Ambulance className="h-3 w-3" />
-                              Dropoff
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </motion.div>
-                  </div>
-
-                  {/* Payment Info */}
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.3 }}
-                    className="bento-card"
-                  >
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                      <div>
-                        <p className="text-sm text-muted-foreground">Payment Status</p>
-                        <p className="text-2xl font-bold text-foreground">{formatINR(Number(selectedMission.quoted_price))}</p>
-                      </div>
-                      <Badge className={selectedMission.payment_status === "paid" ? "bg-success/20 text-success" : "bg-warning/20 text-warning"}>
-                        {selectedMission.payment_status === "paid" ? "✓ Payment Received" : "⏳ Payment Pending"}
-                      </Badge>
-                    </div>
-                  </motion.div>
+                  {/* Expanded Mission Details */}
+                  <MissionDetailsExpanded mission={selectedMission} />
                 </>
               ) : (
                 <div className="bento-card flex items-center justify-center py-20">
