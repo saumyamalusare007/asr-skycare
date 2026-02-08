@@ -19,6 +19,7 @@ interface BookingData {
   serviceType: string;
   patientName: string;
   age: string;
+  aadharId: string;
   contactPhone: string;
   contactEmail: string;
   condition: string;
@@ -83,6 +84,7 @@ export default function PaymentPage() {
         patient_name: booking.patientName,
         patient_age: parseInt(booking.age) || null,
         patient_condition: booking.condition,
+        aadhar_id: booking.aadharId || null,
         service_type: booking.serviceType,
         origin_city: booking.originCity?.name || "",
         origin_code: booking.originCity?.code || "",
