@@ -1,8 +1,9 @@
  import { useState, useEffect } from "react";
  import { useNavigate, useSearchParams } from "react-router-dom";
  import { motion, AnimatePresence } from "framer-motion";
- import { Header } from "@/components/layout/Header";
- import { Footer } from "@/components/layout/Footer";
+import { Header } from "@/components/layout/Header";
+import { Footer } from "@/components/layout/Footer";
+import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
  import { Button } from "@/components/ui/button";
  import { Input } from "@/components/ui/input";
  import { Label } from "@/components/ui/label";
@@ -557,10 +558,11 @@
                  </Button>
                )}
              </div>
-           </div>
-         </div>
-       </main>
-       <Footer />
-     </div>
-   );
- }
+            </div>
+          </div>
+        </main>
+        <Footer />
+        <MobileBottomNav />
+      </div>
+    );
+  }
