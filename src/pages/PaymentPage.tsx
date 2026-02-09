@@ -1,17 +1,16 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
-import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
-import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
-import { FlightRouteMap } from "@/components/booking/FlightRouteMap";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Plane, Clock, Users, CreditCard, Wallet, Building2, Smartphone, Plus, Minus, Check, Shield, AlertCircle, Activity, Wind, Droplets, Heart } from "lucide-react";
-import { formatINR, type IndianCity, type ServiceType } from "@/lib/data";
-import logo from "@/assets/logo-asr.png";
+ import { useState, useEffect } from "react";
+ import { useNavigate } from "react-router-dom";
+ import { motion } from "framer-motion";
+ import { Header } from "@/components/layout/Header";
+ import { Footer } from "@/components/layout/Footer";
+ import { FlightRouteMap } from "@/components/booking/FlightRouteMap";
+ import { Button } from "@/components/ui/button";
+ import { Input } from "@/components/ui/input";
+ import { Label } from "@/components/ui/label";
+ import { Switch } from "@/components/ui/switch";
+ import { Plane, Clock, Users, CreditCard, Wallet, Building2, Smartphone, Plus, Minus, Check, Shield, AlertCircle, Activity, Wind, Droplets, Heart } from "lucide-react";
+ import { formatINR, type IndianCity, type ServiceType } from "@/lib/data";
+ import logo from "@/assets/logo-asr.png";
  
  interface BookingData {
    serviceType: string;
@@ -336,11 +335,10 @@ import logo from "@/assets/logo-asr.png";
                    Secured by ASR Aviation
                  </div>
                </div>
-              </div>
-            </div>
-          </div>
-        </main>
-        <MobileBottomNav />
-      </div>
-    );
-  }
+             </div>
+           </div>
+         </div>
+       </main>
+     </div>
+   );
+ }
