@@ -1,72 +1,84 @@
  // Fleet data for Indian market
- export interface FleetAircraft {
-   id: string;
-   operator: string;
-   model: string;
-   baseHub: string;
-   baseHubCode: string;
-   hourlyRate: number;
-   icuCapable: boolean;
-   maxPassengers: number;
-   range: string;
- }
+export interface FleetAircraft {
+  id: string;
+  operator: string;
+  model: string;
+  baseHub: string;
+  baseHubCode: string;
+  hourlyRate: number;
+  icuCapable: boolean;
+  maxPassengers: number;
+  range: string;
+  image: string;
+  medicalStaff: string;
+}
  
- export const fleetData: FleetAircraft[] = [
-   {
-     id: "1",
-     operator: "ACS (Air Charter Service)",
-     model: "Falcon 2000",
-     baseHub: "Delhi",
-     baseHubCode: "DEL",
-     hourlyRate: 350000,
-     icuCapable: true,
-     maxPassengers: 8,
-     range: "5,550 km",
-   },
-   {
-     id: "2",
-     operator: "JetSetGo",
-     model: "Hawker 800XP",
-     baseHub: "Mumbai",
-     baseHubCode: "BOM",
-     hourlyRate: 280000,
-     icuCapable: true,
-     maxPassengers: 6,
-     range: "4,630 km",
-   },
-   {
-     id: "3",
-     operator: "Xeontech Aviation",
-     model: "Learjet 45",
-     baseHub: "Bangalore",
-     baseHubCode: "BLR",
-     hourlyRate: 220000,
-     icuCapable: true,
-     maxPassengers: 6,
-     range: "3,700 km",
-   },
-   {
-     id: "4",
-     operator: "VSR Ventures",
-     model: "King Air B200",
-     baseHub: "Delhi",
-     baseHubCode: "DEL",
-     hourlyRate: 180000,
-     icuCapable: true,
-     maxPassengers: 4,
-     range: "2,200 km",
-   },
-   {
-     id: "5",
-     operator: "Jipson Aviation",
-     model: "Beechcraft C90",
-     baseHub: "Chennai",
-     baseHubCode: "MAA",
-     hourlyRate: 150000,
-     icuCapable: false,
-     maxPassengers: 4,
-     range: "1,850 km",
-   },
+export const fleetData: FleetAircraft[] = [
+  {
+    id: "1",
+    operator: "ACS (Air Charter Service)",
+    model: "Falcon 2000",
+    baseHub: "Delhi",
+    baseHubCode: "DEL",
+    hourlyRate: 350000,
+    icuCapable: true,
+    maxPassengers: 8,
+    range: "5,550 km",
+    image: "https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?auto=format&fit=crop&q=80&w=800",
+    medicalStaff: "2 Pilots, 1 ICU Doctor, 1 Paramedic",
+  },
+  {
+    id: "2",
+    operator: "JetSetGo",
+    model: "Hawker 800XP",
+    baseHub: "Mumbai",
+    baseHubCode: "BOM",
+    hourlyRate: 280000,
+    icuCapable: true,
+    maxPassengers: 6,
+    range: "4,630 km",
+    image: "https://images.unsplash.com/photo-1540962351504-03099e0a754b?auto=format&fit=crop&q=80&w=800",
+    medicalStaff: "2 Pilots, 1 ICU Doctor, 1 Paramedic",
+  },
+  {
+    id: "3",
+    operator: "Xeontech Aviation",
+    model: "Learjet 45",
+    baseHub: "Bangalore",
+    baseHubCode: "BLR",
+    hourlyRate: 220000,
+    icuCapable: true,
+    maxPassengers: 6,
+    range: "3,700 km",
+    image: "https://images.unsplash.com/photo-1540962351504-03099e0a754b?auto=format&fit=crop&q=80&w=800",
+    medicalStaff: "2 Pilots, 1 Doctor, 1 Paramedic",
+  },
+  {
+    id: "4",
+    operator: "VSR Ventures",
+    model: "King Air B200",
+    baseHub: "Delhi",
+    baseHubCode: "DEL",
+    hourlyRate: 180000,
+    icuCapable: true,
+    maxPassengers: 4,
+    range: "2,200 km",
+    image: "https://images.unsplash.com/photo-1524592714635-d42514470304?auto=format&fit=crop&q=80&w=800",
+    medicalStaff: "2 Pilots, 1 Doctor, 1 Nurse",
+  },
+  {
+    id: "5",
+    operator: "Jipson Aviation",
+    model: "Beechcraft C90",
+    baseHub: "Chennai",
+    baseHubCode: "MAA",
+    hourlyRate: 150000,
+    icuCapable: false,
+    maxPassengers: 4,
+    range: "1,850 km",
+    image: "https://images.unsplash.com/photo-1524592714635-d42514470304?auto=format&fit=crop&q=80&w=800",
+    medicalStaff: "2 Pilots, 1 Paramedic",
+  },
   {
     id: "6",
     operator: "Club One Air",
@@ -77,6 +89,8 @@
     icuCapable: true,
     maxPassengers: 12,
     range: "11,000 km",
+    image: "https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?auto=format&fit=crop&q=80&w=800",
+    medicalStaff: "2 Pilots, 1 ICU Doctor, 2 Paramedics",
   },
   {
     id: "7",
@@ -88,6 +102,8 @@
     icuCapable: false,
     maxPassengers: 4,
     range: "600 km",
+    image: "https://images.unsplash.com/photo-1532635241-17e820acc59f?auto=format&fit=crop&q=80&w=800",
+    medicalStaff: "1 Pilot, 1 Paramedic",
   },
   {
     id: "8",
@@ -99,6 +115,8 @@
     icuCapable: true,
     maxPassengers: 5,
     range: "900 km",
+    image: "https://images.unsplash.com/photo-1464039397811-476f652a343b?auto=format&fit=crop&q=80&w=800",
+    medicalStaff: "1 Pilot, 1 ICU Doctor, 1 Paramedic",
   },
   {
     id: "9",
@@ -110,6 +128,8 @@
     icuCapable: true,
     maxPassengers: 6,
     range: "2,800 km",
+    image: "https://images.unsplash.com/photo-1524592714635-d42514470304?auto=format&fit=crop&q=80&w=800",
+    medicalStaff: "2 Pilots, 1 Doctor, 1 Nurse",
   },
 ];
  
