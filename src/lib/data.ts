@@ -67,18 +67,51 @@
      maxPassengers: 4,
      range: "1,850 km",
    },
-   {
-     id: "6",
-     operator: "Club One Air",
-     model: "Gulfstream G550",
-     baseHub: "Mumbai",
-     baseHubCode: "BOM",
-     hourlyRate: 650000,
-     icuCapable: true,
-     maxPassengers: 12,
-     range: "11,000 km",
-   },
- ];
+  {
+    id: "6",
+    operator: "Club One Air",
+    model: "Gulfstream G550",
+    baseHub: "Mumbai",
+    baseHubCode: "BOM",
+    hourlyRate: 650000,
+    icuCapable: true,
+    maxPassengers: 12,
+    range: "11,000 km",
+  },
+  {
+    id: "7",
+    operator: "Pawan Hans",
+    model: "Bell 407 (Helicopter)",
+    baseHub: "Delhi",
+    baseHubCode: "DEL",
+    hourlyRate: 200000,
+    icuCapable: false,
+    maxPassengers: 4,
+    range: "600 km",
+  },
+  {
+    id: "8",
+    operator: "Global Vectra Helicorp",
+    model: "Agusta 109 (Helicopter)",
+    baseHub: "Mumbai",
+    baseHubCode: "BOM",
+    hourlyRate: 320000,
+    icuCapable: true,
+    maxPassengers: 5,
+    range: "900 km",
+  },
+  {
+    id: "9",
+    operator: "VSR Ventures",
+    model: "King Air B200 (Long-Range)",
+    baseHub: "Bangalore",
+    baseHubCode: "BLR",
+    hourlyRate: 195000,
+    icuCapable: true,
+    maxPassengers: 6,
+    range: "2,800 km",
+  },
+];
  
  export interface ServiceType {
    id: string;
@@ -176,7 +209,18 @@
    medicalNotes: string;
  }
  
- export const certifications = [
+export const operatorContacts: Record<string, { phone: string; whatsapp: string }> = {
+  "ACS (Air Charter Service)": { phone: "+91 11 4160 0000", whatsapp: "+911141600000" },
+  "JetSetGo": { phone: "+91 80 4857 4857", whatsapp: "+918048574857" },
+  "Xeontech Aviation": { phone: "+91 80 2520 1234", whatsapp: "+918025201234" },
+  "VSR Ventures": { phone: "+91 11 4055 5555", whatsapp: "+911140555555" },
+  "Jipson Aviation": { phone: "+91 44 2815 0000", whatsapp: "+914428150000" },
+  "Club One Air": { phone: "+91 22 4343 4343", whatsapp: "+912243434343" },
+  "Pawan Hans": { phone: "+91 11 2465 2465", whatsapp: "+911124652465" },
+  "Global Vectra Helicorp": { phone: "+91 22 6677 8899", whatsapp: "+912266778899" },
+};
+
+export const certifications = [
    { name: "EASA Certified", description: "European Aviation Safety Agency" },
    { name: "FAA Approved", description: "US Federal Aviation Administration" },
    { name: "ISO 9001:2015", description: "Quality Management System" },

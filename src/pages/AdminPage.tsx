@@ -1,6 +1,6 @@
- import { useState } from "react";
- import { motion } from "framer-motion";
- import { Header } from "@/components/layout/Header";
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { useIsMobile } from "@/hooks/use-mobile";
  import { Button } from "@/components/ui/button";
  import { Input } from "@/components/ui/input";
  import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -124,25 +124,43 @@
    "neonatal": Baby,
  };
  
- export default function AdminPage() {
-   const [selectedBooking, setSelectedBooking] = useState(mockBookings[0]);
-   const [filterStatus, setFilterStatus] = useState("all");
-   const [searchQuery, setSearchQuery] = useState("");
-   const [filterOrigin, setFilterOrigin] = useState("all");
+export default function AdminPage() {
+  const isMobile = useIsMobile();
+  const [allBookings, setAllBookings] = useState(mockBookings);
+  const [selectedBooking, setSelectedBooking] = useState(allBookings[0]);
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterOrigin, setFilterOrigin] = useState("all");
+
+  // Merge localStorage user bookings with mock data
+  useEffect(() => {
+    const userBookings = JSON.parse(localStorage.getItem("userBookings") || "[]");
+    if (userBookings.length > 0) {
+      const merged = [...userBookings, ...mockBookings];
+      setAllBookings(merged);
+      setSelectedBooking(merged[0]);
+    }
+  }, []);
+
+  // Check if booking is "new" (created in last 10 minutes)
+  const isNewBooking = (createdAt: string) => {
+    const diff = Date.now() - new Date(createdAt).getTime();
+    return diff < 10 * 60 * 1000;
+  };
+
+  const filteredBookings = allBookings.filter((booking) => {
+    if (filterStatus !== "all" && booking.status !== filterStatus) return false;
+    if (filterOrigin !== "all" && booking.origin !== filterOrigin) return false;
+    if (searchQuery && !booking.patientName.toLowerCase().includes(searchQuery.toLowerCase()) && !booking.id.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+    return true;
+  });
  
-   const filteredBookings = mockBookings.filter((booking) => {
-     if (filterStatus !== "all" && booking.status !== filterStatus) return false;
-     if (filterOrigin !== "all" && booking.origin !== filterOrigin) return false;
-     if (searchQuery && !booking.patientName.toLowerCase().includes(searchQuery.toLowerCase()) && !booking.id.toLowerCase().includes(searchQuery.toLowerCase())) return false;
-     return true;
-   });
- 
-   const stats = {
-     totalMissions: mockBookings.length,
-     activeMissions: mockBookings.filter(b => b.status === "in_progress").length,
-     pendingPayments: mockBookings.filter(b => b.paymentStatus === "pending").length,
-     revenue: mockBookings.filter(b => b.paymentStatus === "paid").reduce((acc, b) => acc + b.quotedPrice, 0),
-   };
+  const stats = {
+    totalMissions: allBookings.length,
+    activeMissions: allBookings.filter(b => b.status === "in_progress").length,
+    pendingPayments: allBookings.filter(b => b.paymentStatus === "pending").length,
+    revenue: allBookings.filter(b => b.paymentStatus === "paid").reduce((acc, b) => acc + b.quotedPrice, 0),
+  };
  
    return (
      <div className="min-h-screen bg-muted/30">
@@ -307,7 +325,10 @@
                            </div>
                            <span className="font-medium text-foreground">{booking.id}</span>
                          </div>
-                         <Badge className={status.color}>{status.label}</Badge>
+                          <Badge className={status.color}>{status.label}</Badge>
+                          {isNewBooking(booking.createdAt) && (
+                            <Badge className="bg-aviation-red text-white animate-pulse ml-1">New</Badge>
+                          )}
                        </div>
                        <p className="font-medium text-sm text-foreground mb-1">{booking.patientName}</p>
                        <p className="text-xs text-muted-foreground mb-2">
