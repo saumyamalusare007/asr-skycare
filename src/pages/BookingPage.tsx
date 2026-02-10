@@ -67,18 +67,52 @@
      if (currentStep > 1) setCurrentStep(currentStep - 1);
    };
  
-   const handleSubmit = () => {
-     // Store booking data and navigate to payment
-     const bookingData = {
-       ...formData,
-       quotedPrice: calculatePrice(),
-       originCity,
-       destinationCity,
-       selectedService,
-     };
-     localStorage.setItem("pendingBooking", JSON.stringify(bookingData));
-     navigate("/payment");
-   };
+    const handleSubmit = () => {
+      // Store booking data for admin + success page
+      const bookingId = `ASR-${Date.now().toString(36).toUpperCase()}`;
+      const bookingData = {
+        ...formData,
+        bookingId,
+        quotedPrice: calculatePrice(),
+        originCity,
+        destinationCity,
+        selectedService,
+        status: "confirmed",
+        createdAt: new Date().toISOString(),
+      };
+      localStorage.setItem("pendingBooking", JSON.stringify(bookingData));
+      localStorage.setItem("confirmedBooking", JSON.stringify(bookingData));
+
+      // Append to admin bookings in localStorage
+      const existingBookings = JSON.parse(localStorage.getItem("userBookings") || "[]");
+      existingBookings.unshift({
+        id: bookingId,
+        patientName: formData.patientName,
+        age: parseInt(formData.age) || 0,
+        condition: formData.condition,
+        serviceType: formData.serviceType,
+        origin: formData.origin,
+        destination: formData.destination,
+        status: "confirmed",
+        statusStep: 1,
+        quotedPrice: calculatePrice(),
+        paymentStatus: "pending",
+        flightDate: formData.flightDate,
+        createdAt: new Date().toISOString(),
+        contactPhone: formData.contactPhone,
+        passengers: formData.passengers,
+        ambulancePickup: formData.ambulancePickup,
+        ambulanceDropoff: formData.ambulanceDropoff,
+        assignedAircraft: null,
+        operator: null,
+      });
+      localStorage.setItem("userBookings", JSON.stringify(existingBookings));
+
+      // Redirect to Razorpay payment link
+      window.open("https://rzp.io/rzp/1aBf5EI", "_blank");
+      // Navigate to success page
+      navigate("/payment-success");
+    };
  
    return (
      <div className="min-h-screen bg-background">
