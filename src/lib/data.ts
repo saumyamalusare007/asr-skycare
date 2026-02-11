@@ -63,7 +63,7 @@ export const fleetData: FleetAircraft[] = [
     icuCapable: true,
     maxPassengers: 4,
     range: "2,200 km",
-    image: "https://www.corporatejetinvestor.com/wp-content/uploads/2025/07/Screenshot-2025-07-14-at-13.04.57-800x520.jpg",
+    image: "https://www.charterflightsaviation.com/images/King-Air-B200/King-air-b200-1.png",
     medicalStaff: "2 Pilots, 1 Doctor, 1 Nurse",
   },
   {
@@ -76,7 +76,7 @@ export const fleetData: FleetAircraft[] = [
     icuCapable: false,
     maxPassengers: 4,
     range: "1,850 km",
-    image: "https://upload.wikimedia.org/wikipedia/commons/b/b3/Tc-90_04l.jpg",
+    image: "https://static.vecdn.net/images/aircraft/beechcraft-king-air-90/aircraft.jpg",
     medicalStaff: "2 Pilots, 1 Paramedic",
   },
   {
@@ -128,7 +128,7 @@ export const fleetData: FleetAircraft[] = [
     icuCapable: true,
     maxPassengers: 6,
     range: "2,800 km",
-    image: "https://www.corporatejetinvestor.com/wp-content/uploads/2025/07/Screenshot-2025-07-14-at-13.04.57-800x520.jpg",
+    image: "https://images.prismic.io/privatefly/adc3960bd7694d2e491c4f844ae28fcf62691f68_beech-be200-super-king-air-privatefly-ab1106.jpg?auto=compress,format",
     medicalStaff: "2 Pilots, 1 Doctor, 1 Nurse",
   },
 ];
