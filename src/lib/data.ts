@@ -24,7 +24,7 @@ export const fleetData: FleetAircraft[] = [
     icuCapable: true,
     maxPassengers: 8,
     range: "5,550 km",
-    image: "https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?auto=format&fit=crop&q=80&w=800",
+    image: "https://www.jetcraft.com/wp-content/uploads/2018/12/Falcon-2000-Ext-Header-JS.jpg",
     medicalStaff: "2 Pilots, 1 ICU Doctor, 1 Paramedic",
   },
   {
@@ -37,7 +37,7 @@ export const fleetData: FleetAircraft[] = [
     icuCapable: true,
     maxPassengers: 6,
     range: "4,630 km",
-    image: "https://images.unsplash.com/photo-1540962351504-03099e0a754b?auto=format&fit=crop&q=80&w=800",
+    image: "https://www.jetcraft.com/wp-content/uploads/2016/03/hawker-800xp-Exterior-NEW-jS.jpg",
     medicalStaff: "2 Pilots, 1 ICU Doctor, 1 Paramedic",
   },
   {
@@ -50,7 +50,7 @@ export const fleetData: FleetAircraft[] = [
     icuCapable: true,
     maxPassengers: 6,
     range: "3,700 km",
-    image: "https://images.unsplash.com/photo-1540962351504-03099e0a754b?auto=format&fit=crop&q=80&w=800",
+    image: "https://www.jetcraft.com/wp-content/uploads/2015/02/Lear45XR-ext-JS.jpg",
     medicalStaff: "2 Pilots, 1 Doctor, 1 Paramedic",
   },
   {
@@ -63,7 +63,7 @@ export const fleetData: FleetAircraft[] = [
     icuCapable: true,
     maxPassengers: 4,
     range: "2,200 km",
-    image: "https://images.unsplash.com/photo-1524592714635-d42514470304?auto=format&fit=crop&q=80&w=800",
+    image: "https://www.corporatejetinvestor.com/wp-content/uploads/2025/07/Screenshot-2025-07-14-at-13.04.57-800x520.jpg",
     medicalStaff: "2 Pilots, 1 Doctor, 1 Nurse",
   },
   {
@@ -76,7 +76,7 @@ export const fleetData: FleetAircraft[] = [
     icuCapable: false,
     maxPassengers: 4,
     range: "1,850 km",
-    image: "https://images.unsplash.com/photo-1524592714635-d42514470304?auto=format&fit=crop&q=80&w=800",
+    image: "https://upload.wikimedia.org/wikipedia/commons/b/b3/Tc-90_04l.jpg",
     medicalStaff: "2 Pilots, 1 Paramedic",
   },
   {
@@ -89,7 +89,7 @@ export const fleetData: FleetAircraft[] = [
     icuCapable: true,
     maxPassengers: 12,
     range: "11,000 km",
-    image: "https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?auto=format&fit=crop&q=80&w=800",
+    image: "https://cdn.privatejetcardcomparisons.com/uploads/Gulfstream-G550-pric1e.jpg",
     medicalStaff: "2 Pilots, 1 ICU Doctor, 2 Paramedics",
   },
   {
@@ -102,7 +102,7 @@ export const fleetData: FleetAircraft[] = [
     icuCapable: false,
     maxPassengers: 4,
     range: "600 km",
-    image: "https://images.unsplash.com/photo-1532635241-17e820acc59f?auto=format&fit=crop&q=80&w=800",
+    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Nassau_County_Police_Bell_407.jpg/500px-Nassau_County_Police_Bell_407.jpg",
     medicalStaff: "1 Pilot, 1 Paramedic",
   },
   {
@@ -115,7 +115,7 @@ export const fleetData: FleetAircraft[] = [
     icuCapable: true,
     maxPassengers: 5,
     range: "900 km",
-    image: "https://images.unsplash.com/photo-1464039397811-476f652a343b?auto=format&fit=crop&q=80&w=800",
+    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/RAF_A109.jpg/500px-RAF_A109.jpg",
     medicalStaff: "1 Pilot, 1 ICU Doctor, 1 Paramedic",
   },
   {
@@ -128,7 +128,7 @@ export const fleetData: FleetAircraft[] = [
     icuCapable: true,
     maxPassengers: 6,
     range: "2,800 km",
-    image: "https://images.unsplash.com/photo-1524592714635-d42514470304?auto=format&fit=crop&q=80&w=800",
+    image: "https://www.corporatejetinvestor.com/wp-content/uploads/2025/07/Screenshot-2025-07-14-at-13.04.57-800x520.jpg",
     medicalStaff: "2 Pilots, 1 Doctor, 1 Nurse",
   },
 ];
