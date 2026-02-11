@@ -76,7 +76,7 @@ export const fleetData: FleetAircraft[] = [
     icuCapable: false,
     maxPassengers: 4,
     range: "1,850 km",
-    image: "https://static.vecdn.net/images/aircraft/beechcraft-king-air-90/aircraft.jpg",
+    image: "https://foreseeaviation.in/wp-content/uploads/2020/09/C-90-exterior-.jpg",
     medicalStaff: "2 Pilots, 1 Paramedic",
   },
   {
