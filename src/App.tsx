@@ -11,6 +11,7 @@ import AdminPage from "./pages/AdminPage";
 import ServicesPage from "./pages/ServicesPage";
 import FleetPage from "./pages/FleetPage";
 import NotFound from "./pages/NotFound";
+import { WhatsAppButton } from "./components/WhatsAppButton";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +31,7 @@ const App = () => (
           <Route path="/admin" element={<AdminPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
+        <WhatsAppButton />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
