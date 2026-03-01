@@ -4,8 +4,7 @@ import { Home, Plane, Phone, User } from "lucide-react";
 const navItems = [
   { href: "/", label: "Home", icon: Home },
   { href: "/booking", label: "My Flights", icon: Plane },
-  { href: "tel:1800-ASR-HELP", label: "Support", icon: Phone, external: true },
-  { href: "/admin", label: "Profile", icon: User },
+  { href: "tel:9829538079", label: "Support", icon: Phone, external: true },
 ];
 
 export function BottomNav() {

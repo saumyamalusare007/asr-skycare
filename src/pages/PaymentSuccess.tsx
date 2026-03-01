@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { BottomNav } from "@/components/layout/BottomNav";
-import { formatINR } from "@/lib/data";
 
 interface BookingData {
   bookingId: string;
@@ -100,7 +99,7 @@ export default function PaymentSuccess() {
                     <p className="text-xs text-muted-foreground mb-1 flex items-center gap-1">
                       <Plane className="h-3 w-3" /> Aircraft
                     </p>
-                    <p className="text-sm font-medium">{booking.selectedService?.aircraft || "King Air 350"}</p>
+                    <p className="text-sm font-medium">{booking.selectedService?.aircraft || "To be assigned"}</p>
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground mb-1 flex items-center gap-1">
@@ -117,8 +116,8 @@ export default function PaymentSuccess() {
                     <p className="text-sm font-medium">{booking.flightDate || "TBD"}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-muted-foreground mb-1">Total</p>
-                    <p className="text-sm font-bold text-aviation-red">{formatINR(booking.quotedPrice)}</p>
+                    <p className="text-xs text-muted-foreground mb-1">Status</p>
+                    <p className="text-sm font-bold text-success">Confirmed</p>
                   </div>
                 </div>
               </motion.div>
@@ -133,7 +132,6 @@ export default function PaymentSuccess() {
             >
               <h3 className="font-display font-semibold text-foreground mb-6">Mission Timeline</h3>
               <div className="relative">
-                {/* Timeline connector line */}
                 <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-border" />
                 <div className="space-y-6">
                   {timelineSteps.map((step, index) => {
@@ -185,7 +183,7 @@ export default function PaymentSuccess() {
               </div>
             </motion.div>
 
-            {/* Next Steps - Bento Grid */}
+            {/* Next Steps */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -235,7 +233,7 @@ export default function PaymentSuccess() {
               <h3 className="font-semibold text-foreground mb-4">Help & Support</h3>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <a
-                  href="https://wa.me/911800277435?text=Hi%20ASR%20Aviation%2C%20I%20need%20help%20with%20my%20booking"
+                  href="https://wa.me/919829538079?text=Hi%20ASR%20Aviation%2C%20I%20need%20help%20with%20my%20booking"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-3 p-4 rounded-xl bg-success/5 border border-success/20 hover:bg-success/10 transition-colors min-h-[48px]"
@@ -244,7 +242,7 @@ export default function PaymentSuccess() {
                   <span className="text-sm font-medium">WhatsApp Support</span>
                 </a>
                 <a
-                  href="tel:1800-ASR-HELP"
+                  href="tel:9829538079"
                   className="flex items-center gap-3 p-4 rounded-xl bg-aviation-red/5 border border-aviation-red/20 hover:bg-aviation-red/10 transition-colors min-h-[48px]"
                 >
                   <PhoneCall className="h-5 w-5 text-aviation-red" />
