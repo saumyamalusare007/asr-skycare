@@ -8,6 +8,7 @@ import BookingPage from "./pages/BookingPage";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import BookingConfirmation from "./pages/BookingConfirmation";
 import AdminPage from "./pages/AdminPage";
+import AdminLogin from "./pages/AdminLogin";
 import ServicesPage from "./pages/ServicesPage";
 import FleetPage from "./pages/FleetPage";
 import NotFound from "./pages/NotFound";
@@ -28,7 +29,8 @@ const App = () => (
           <Route path="/booking" element={<BookingPage />} />
           <Route path="/payment-success" element={<PaymentSuccess />} />
           <Route path="/booking-confirmation" element={<BookingConfirmation />} />
-          <Route path="/admin" element={<AdminPage />} />
+          <Route path="/internal-admin" element={<AdminPage />} />
+          <Route path="/admin-login" element={<AdminLogin />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         <WhatsAppButton />
