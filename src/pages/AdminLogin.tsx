@@ -5,17 +5,36 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Lock, Mail, AlertCircle, UserPlus, LogIn } from "lucide-react";
+import { Lock, Mail, AlertCircle, UserPlus, LogIn, Eye, EyeOff } from "lucide-react";
 import logo from "@/assets/logo-asr.png";
 
 export default function AdminLogin() {
   const navigate = useNavigate();
   const [isSignUp, setIsSignUp] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const verifyAdminAndNavigate = async (userId: string) => {
+    const { data: roleData, error: roleError } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId)
+      .eq("role", "admin")
+      .maybeSingle();
+
+    if (roleError || !roleData) {
+      setError("Access denied. You are not authorized as an administrator.");
+      await supabase.auth.signOut();
+      return false;
+    }
+
+    navigate("/internal-admin");
+    return true;
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,6 +46,9 @@ export default function AdminLogin() {
       const { error: signUpError } = await supabase.auth.signUp({
         email,
         password,
+        options: {
+          emailRedirectTo: window.location.origin,
+        },
       });
 
       if (signUpError) {
@@ -35,8 +57,27 @@ export default function AdminLogin() {
         return;
       }
 
-      setSuccess("Account created! Please check your email to confirm, then log in.");
-      setIsSignUp(false);
+      // Auto-confirm is enabled for new signups; try immediate sign-in.
+      const { data: loginData, error: loginError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (loginError || !loginData.user) {
+        const loginMessage = loginError?.message?.toLowerCase() ?? "";
+
+        if (loginMessage.includes("email not confirmed")) {
+          await supabase.auth.resend({ type: "signup", email });
+          setError("This email is still unconfirmed. We sent a new confirmation email. For instant access now, sign up with a new email.");
+        } else {
+          setError(loginError?.message || "Unable to sign in right now. Please try again.");
+        }
+
+        setLoading(false);
+        return;
+      }
+
+      await verifyAdminAndNavigate(loginData.user.id);
       setLoading(false);
       return;
     }
@@ -46,28 +87,22 @@ export default function AdminLogin() {
       password,
     });
 
-    if (authError) {
-      setError(authError.message);
+    if (authError || !data.user) {
+      const authMessage = authError?.message?.toLowerCase() ?? "";
+
+      if (authMessage.includes("email not confirmed")) {
+        await supabase.auth.resend({ type: "signup", email });
+        setError("Email not confirmed. We sent a fresh confirmation email. If you need instant access, create a new account from Sign Up.");
+      } else {
+        setError(authError?.message || "Invalid credentials.");
+      }
+
       setLoading(false);
       return;
     }
 
-    // Check if user has admin role
-    const { data: roleData, error: roleError } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", data.user.id)
-      .eq("role", "admin")
-      .maybeSingle();
-
-    if (roleError || !roleData) {
-      setError("Access denied. You are not authorized as an administrator.");
-      await supabase.auth.signOut();
-      setLoading(false);
-      return;
-    }
-
-    navigate("/internal-admin");
+    await verifyAdminAndNavigate(data.user.id);
+    setLoading(false);
   };
 
   return (
@@ -123,14 +158,22 @@ export default function AdminLogin() {
               <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
                 id="password"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 placeholder="••••••••"
-                className="pl-10"
+                className="pl-10 pr-10"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 minLength={6}
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="absolute right-3 top-3 text-muted-foreground hover:text-foreground transition-colors"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
             </div>
           </div>
 
