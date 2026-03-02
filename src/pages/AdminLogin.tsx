@@ -5,20 +5,41 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Lock, Mail, AlertCircle } from "lucide-react";
+import { Lock, Mail, AlertCircle, UserPlus, LogIn } from "lucide-react";
 import logo from "@/assets/logo-asr.png";
 
 export default function AdminLogin() {
   const navigate = useNavigate();
+  const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setSuccess("");
     setLoading(true);
+
+    if (isSignUp) {
+      const { error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+      });
+
+      if (signUpError) {
+        setError(signUpError.message);
+        setLoading(false);
+        return;
+      }
+
+      setSuccess("Account created! Please check your email to confirm, then log in.");
+      setIsSignUp(false);
+      setLoading(false);
+      return;
+    }
 
     const { data, error: authError } = await supabase.auth.signInWithPassword({
       email,
@@ -62,7 +83,7 @@ export default function AdminLogin() {
             Admin Portal
           </h1>
           <p className="text-white/60 text-sm">
-            Authorized personnel only
+            {isSignUp ? "Create a new admin account" : "Authorized personnel only"}
           </p>
         </div>
 
@@ -71,6 +92,12 @@ export default function AdminLogin() {
             <div className="flex items-center gap-2 p-3 rounded-lg bg-destructive/10 text-destructive text-sm">
               <AlertCircle className="h-4 w-4 shrink-0" />
               {error}
+            </div>
+          )}
+
+          {success && (
+            <div className="flex items-center gap-2 p-3 rounded-lg bg-success/10 text-success text-sm">
+              {success}
             </div>
           )}
 
@@ -102,13 +129,29 @@ export default function AdminLogin() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                minLength={6}
               />
             </div>
           </div>
 
           <Button type="submit" variant="aviation" className="w-full" disabled={loading}>
-            {loading ? "Signing in..." : "Sign In"}
+            {loading ? (
+              isSignUp ? "Creating account..." : "Signing in..."
+            ) : (
+              <span className="flex items-center gap-2">
+                {isSignUp ? <UserPlus className="h-4 w-4" /> : <LogIn className="h-4 w-4" />}
+                {isSignUp ? "Create Account" : "Sign In"}
+              </span>
+            )}
           </Button>
+
+          <button
+            type="button"
+            onClick={() => { setIsSignUp(!isSignUp); setError(""); setSuccess(""); }}
+            className="w-full text-sm text-center text-muted-foreground hover:text-foreground transition-colors"
+          >
+            {isSignUp ? "Already have an account? Sign In" : "Need an account? Sign Up"}
+          </button>
 
           <p className="text-xs text-center text-muted-foreground">
             Contact your system administrator for access credentials.
