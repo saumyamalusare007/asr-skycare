@@ -7,12 +7,14 @@ import organTransport from "@/assets/organ-transport.jpg";
 import icuInterior from "@/assets/icu-interior.jpg";
 import emergencyEvac from "@/assets/emergency-evac.jpg";
 import neonatalCare from "@/assets/neonatal-care.jpg";
+import mortuaryFlight from "@/assets/mortuary-flight.jpg";
 
 const images: Record<string, string> = {
   "organ-transport": organTransport,
   "icu-interior": icuInterior,
   "emergency-evac": emergencyEvac,
   "neonatal-care": neonatalCare,
+  "mortuary-flight": mortuaryFlight,
 };
 
 const icons: Record<string, React.ComponentType<{ className?: string }>> = {

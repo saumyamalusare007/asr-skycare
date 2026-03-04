@@ -193,7 +193,7 @@ export const serviceTypes: ServiceType[] = [
     aircraft: "King Air B200",
     priceRange: { min: 800000, max: 2000000 },
     icon: "Skull",
-    image: "",
+    image: "mortuary-flight",
   },
 ];
 
